@@ -1,0 +1,42 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-10T03:10:08.914Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 1,
+    "implemented": 1,
+    "items": [
+      {
+        "id": "REQ-1",
+        "summary": "Update only the catalog item price that renders in the selected element at XPath `/html[1]/body[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[4]/div[1]/div[1]/span[1]` so that it displays as AED 4 (i.e., the backend `price` value for that specific item must be `4`).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/features/catalog/CatalogPage.tsx",
+          "frontend/src/features/catalog/catalog-price-xpath.regression.test.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/features/catalog/CatalogPage.tsx",
+          "frontend/src/features/catalog/catalog-price-xpath.regression.test.ts"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/features/catalog/CatalogPage.tsx",
+    "frontend/src/features/catalog/catalog-price-xpath.regression.test.ts",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "frontend/src/App.tsx": "Main application entry point that renders the CatalogPage component within a full-height container.",
+  "frontend/src/features/catalog/CatalogPage.tsx": "Primary catalog browsing page with category tabs, search functionality, responsive table/card views, loading states, error handling with retry, automatic category selection clamping, data attributes on mobile price spans for testing verification, and footer with attribution.",
+  "frontend/src/components/BrandedHeader.tsx": "Header component displaying the Dar Alnasr Laundry logo, title, and subtitle with a subtle background image overlay.",
+  "frontend/src/components/CategoryTabs.tsx": "Reusable tabs component for switching between service categories using shadcn/ui Tabs with responsive 2-column mobile/4-column desktop grid layout, stable keys using category names, and proper text wrapping for longer category names.",
+  "frontend/src/features/catalog/useCatalogQuery.ts": "React Query hook that fetches the catalog data from the backend actor with reduced cache time (staleTime: 0) to ensure updated 2026 prices are always fetched fresh on page load.",
+  "frontend/src/features/catalog/formatting.ts": "Utility function that formats backend price values (bigint) into exact \"AED {amount}.00\" display format using direct string conversion to avoid precision issues.",
+  "frontend/src/index.css": "Global styles with OKLCH color system featuring warm neutrals and teal/turquoise accents for both light and dark modes.",
+  "frontend/tailwind.config.js": "Tailwind configuration with custom color tokens, Inter font family, and extended design system utilities.",
+  "frontend/src/features/catalog/catalog-price-xpath.regression.test.ts": "Regression test suite that verifies the mobile card view price span at the specified XPath displays the correct formatted price (AED 4.00 for Waistcoat) from backend data while ensuring other item prices remain unchanged and no UI hardcoding is used."
+}

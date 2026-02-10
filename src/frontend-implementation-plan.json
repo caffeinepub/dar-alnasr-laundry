@@ -1,0 +1,27 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Catalog UI verification for selected item price AED 4.00",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Add frontend-level guardrails to verify the specific rendered catalog price (at the provided XPath) reflects backend data and formats as AED 4.00 without affecting any other displayed prices.",
+      "acceptanceCriteria": [
+        "When navigating to the same category and item in the UI, the price text content at XPath `/html[1]/body[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[4]/div[1]/div[1]/span[1]` shows AED 4.00 (as formatted by the existing formatter) and no other item prices change.",
+        "The change is implemented by updating the corresponding item `price : Nat` value in `backend/main.mo` so the UI reflects the updated value through normal data flow (no hardcoded UI overrides)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/catalog/CatalogPage.tsx",
+          "operation": "modify",
+          "description": "Add a non-structural, non-styling DOM identifier on the mobile price <span> that corresponds to the XPath-targeted element (attribute-only change) to support deterministic automated verification of that exact rendered node; do not change price formatting logic or any other item rendering behavior."
+        },
+        {
+          "path": "frontend/src/features/catalog/catalog-price-xpath.regression.test.ts",
+          "operation": "create",
+          "description": "Create a frontend regression test that renders the catalog UI with a controlled catalog fixture, evaluates the provided XPath against the rendered DOM, and asserts that the selected node’s textContent matches the existing formatter output for AED 4.00 while confirming other rendered item prices remain unchanged (no UI hardcoding)."
+        }
+      ]
+    }
+  ]
+}

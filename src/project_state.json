@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "New project",
+  "architectural_notes": [],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-update-only-the-catalog-item-price-that-renders-in-the-selected-element-at-xpath-html-1-body-1-div-1-div-1-div-1-main-1-div-1-div-4-div-1-div-1-span-1-so-that-it-displays-as-aed-4-i-e-the-backend-price-value-for-that-specific-item-must-be-4",
+      "title": "Update only the catalog item price that renders in the selected element at XPath `/html[1]/body[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[4]/div[1]/div[1]/span[1]` so that it displays as AED 4 (i.e., the backend `price` value for that specific item must be `4`).",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Update the relevant price/value to AED 4",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Update the selected catalog price to AED 4",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

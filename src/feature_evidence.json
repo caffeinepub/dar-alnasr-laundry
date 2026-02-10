@@ -1,0 +1,24 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-update-only-the-catalog-item-price-that-renders-in-the-selected-element-at-xpath-html-1-body-1-div-1-div-1-div-1-main-1-div-1-div-4-div-1-div-1-span-1-so-that-it-displays-as-aed-4-i-e-the-backend-price-value-for-that-specific-item-must-be-4",
+      "featureTitle": "Update only the catalog item price that renders in the selected element at XPath `/html[1]/body[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[4]/div[1]/div[1]/span[1]` so that it displays as AED 4 (i.e., the backend `price` value for that specific item must be `4`).",
+      "files": [
+        "frontend/src/features/catalog/CatalogPage.tsx",
+        "frontend/src/features/catalog/catalog-price-xpath.regression.test.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

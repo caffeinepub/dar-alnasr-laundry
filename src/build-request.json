@@ -1,0 +1,37 @@
+{
+  "kind": "build_request",
+  "title": "Update the selected catalog price to AED 4",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Update only the catalog item price that renders in the selected element at XPath `/html[1]/body[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[4]/div[1]/div[1]/span[1]` so that it displays as AED 4 (i.e., the backend `price` value for that specific item must be `4`).",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "AED 4"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When navigating to the same category and item in the UI, the price text content at XPath `/html[1]/body[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[4]/div[1]/div[1]/span[1]` shows AED 4.00 (as formatted by the existing formatter) and no other item prices change.",
+        "The change is implemented by updating the corresponding item `price : Nat` value in `backend/main.mo` so the UI reflects the updated value through normal data flow (no hardcoded UI overrides)."
+      ]
+    }
+  ],
+  "constraints": [
+    "Apply the change ONLY to the single UI element identified by the provided XPath by updating the corresponding single catalog item price (do not change global price formatting).",
+    "Backend must remain a single Motoko actor in `backend/main.mo`.",
+    "Do not edit any frontend files under `frontend/src/components/ui` or other immutable paths listed in SYSTEM_CONTEXT."
+  ],
+  "nonGoals": [
+    "Do not change the global price formatting function (e.g., do not remove the trailing .00) unless explicitly requested.",
+    "Do not update unrelated catalog item names, category names, or other prices."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
