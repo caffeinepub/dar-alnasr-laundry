@@ -1,25 +1,205 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Catalog UI verification for selected item price AED 4.00",
+  "title": "Mobile-first laundry ordering flow (catalog → cart → checkout → confirmation → my orders)",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Add frontend-level guardrails to verify the specific rendered catalog price (at the provided XPath) reflects backend data and formats as AED 4.00 without affecting any other displayed prices.",
+      "summary": "Add a mobile-first catalog ordering flow with per-item quantity controls and a cart view showing line totals and an order total.",
       "acceptanceCriteria": [
-        "When navigating to the same category and item in the UI, the price text content at XPath `/html[1]/body[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[4]/div[1]/div[1]/span[1]` shows AED 4.00 (as formatted by the existing formatter) and no other item prices change.",
-        "The change is implemented by updating the corresponding item `price : Nat` value in `backend/main.mo` so the UI reflects the updated value through normal data flow (no hardcoded UI overrides)."
+        "On mobile widths, each catalog item includes an obvious control to add/remove and adjust quantity (min 0).",
+        "A cart view is accessible from the catalog UI and shows selected items, quantities, per-item total, and overall total in AED formatting consistent with existing catalog price display.",
+        "If the cart is empty, checkout is disabled and the UI clearly indicates that the user must add at least one item."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/catalog/CatalogPage.tsx",
-          "operation": "modify",
-          "description": "Add a non-structural, non-styling DOM identifier on the mobile price <span> that corresponds to the XPath-targeted element (attribute-only change) to support deterministic automated verification of that exact rendered node; do not change price formatting logic or any other item rendering behavior."
+          "path": "frontend/src/features/cart/types.ts",
+          "operation": "create",
+          "description": "Define frontend cart types (cart item keyed by category+item, quantity, unit price bigint) to support quantity selection and total calculations."
         },
         {
-          "path": "frontend/src/features/catalog/catalog-price-xpath.regression.test.ts",
+          "path": "frontend/src/features/cart/storage.ts",
           "operation": "create",
-          "description": "Create a frontend regression test that renders the catalog UI with a controlled catalog fixture, evaluates the provided XPath against the rendered DOM, and asserts that the selected node’s textContent matches the existing formatter output for AED 4.00 while confirming other rendered item prices remain unchanged (no UI hardcoding)."
+          "description": "Implement localStorage persistence for cart contents so the cart survives page refresh and Internet Identity login redirects (supports REQ-3 cart retention)."
+        },
+        {
+          "path": "frontend/src/features/cart/CartContext.tsx",
+          "operation": "create",
+          "description": "Create a CartContext + provider that exposes add/remove/setQuantity and derived totals for use across Catalog, Cart, and Checkout screens."
+        },
+        {
+          "path": "frontend/src/features/cart/useCart.ts",
+          "operation": "create",
+          "description": "Add a typed hook wrapper around CartContext for convenient, consistent cart access across the app."
+        },
+        {
+          "path": "frontend/src/features/cart/cartMath.ts",
+          "operation": "create",
+          "description": "Add helpers to compute line totals and order totals using bigint arithmetic and reuse existing AED formatting via formatPrice."
+        },
+        {
+          "path": "frontend/src/features/cart/CartPage.tsx",
+          "operation": "create",
+          "description": "Implement a dedicated cart screen (mobile-first) listing selected items, quantity steppers, per-item total, and overall total; disable Checkout when cart is empty using shadcn-ui components (Button, Card, Alert). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/features/catalog/CatalogPage.tsx",
+          "operation": "modify",
+          "description": "Add mobile-first quantity controls per catalog item (min 0) and a sticky/obvious \"View Cart\" primary action that navigates to the cart screen; ensure prices and totals use existing formatPrice for AED formatting; use shadcn-ui components where appropriate (Button, Card, Table, Input). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wrap the app with the CartProvider and add lightweight view-state navigation so the Cart view is reachable from the Catalog UI (no new routing dependency required)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Implement a checkout screen that validates required fields and shows an order confirmation screen with order ID and summary after submission.",
+      "acceptanceCriteria": [
+        "Checkout form fields are validated (required: name, phone, pickup address, pickup date/time).",
+        "User-facing validation and labels are in English.",
+        "After successful submission, the user sees an order confirmation screen with an order ID and a summary of items and totals."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/checkout/checkoutTypes.ts",
+          "operation": "create",
+          "description": "Define checkout form state types and normalization helpers (e.g., same-as-pickup delivery toggle, pickup window representation, notes)."
+        },
+        {
+          "path": "frontend/src/features/checkout/CheckoutPage.tsx",
+          "operation": "create",
+          "description": "Create a mobile-first checkout screen that collects name, phone, pickup address, optional delivery address with same-as-pickup toggle, pickup date/time window, and order notes; implement English labels and client-side validation with clear inline errors; use shadcn-ui components (Input, Button, Card, Alert) for consistent UI. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/features/orders/usePlaceOrderMutation.ts",
+          "operation": "create",
+          "description": "Add a React Query mutation that submits the order via the backend actor using the current cart + checkout form values, and returns data needed for confirmation UI (order ID + summary)."
+        },
+        {
+          "path": "frontend/src/features/orders/OrderConfirmationPage.tsx",
+          "operation": "create",
+          "description": "Implement an order confirmation screen showing the order ID and a summary of items and totals (AED formatting via formatPrice), with a primary action to view My Orders and a secondary action back to the catalog."
+        },
+        {
+          "path": "frontend/src/backend.d.ts",
+          "operation": "modify",
+          "description": "Update frontend type definitions to reflect the order submission/confirmation data needed by the checkout flow (e.g., include orderId in placed order result, and extended order fields used by confirmation)."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire navigation between Cart → Checkout → Confirmation screens and ensure cart clearing behavior occurs only after successful order submission."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Require Internet Identity authentication before placing an order while allowing unauthenticated catalog browsing, and preserve cart contents through login.",
+      "acceptanceCriteria": [
+        "Unauthenticated users can view categories, search, and prices.",
+        "Attempting to proceed to place an order prompts the user to sign in using the existing Internet Identity integration.",
+        "After login, the user returns to the checkout flow without losing cart contents."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/LoginButton.tsx",
+          "operation": "create",
+          "description": "Add a login/logout button component that uses the existing useInternetIdentity hook (immutable) and clears React Query cache on logout to prevent stale personal data display; implement English user-facing text and loading/disabled states. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/RequireAuthGate.tsx",
+          "operation": "create",
+          "description": "Create a small gate component that, when unauthenticated, shows an English prompt and a primary action to sign in via Internet Identity; when authenticated, renders children (used to guard Checkout/My Orders views)."
+        },
+        {
+          "path": "frontend/src/features/cart/storage.ts",
+          "operation": "modify",
+          "description": "Ensure cart persistence is robust across authentication transitions so that initiating login does not clear cart contents; keep cart stored independently of identity."
+        },
+        {
+          "path": "frontend/src/components/BrandedHeader.tsx",
+          "operation": "modify",
+          "description": "Add top-level navigation actions suitable for mobile (e.g., My Orders, Cart) plus the LoginButton; keep unauthenticated browsing fully functional. Use shadcn-ui Button styling for consistent primary actions. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add guards so that attempting to proceed to Checkout from Cart triggers the RequireAuthGate (prompting sign-in) and then returns the user to the checkout flow after login without losing cart state."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Add a My Orders UI for signed-in users to view order history and detailed order information with empty states.",
+      "acceptanceCriteria": [
+        "A signed-in user can navigate to a list of their orders.",
+        "Selecting an order shows full order detail (items, quantities, unit prices, totals, addresses, pickup schedule, notes, status).",
+        "If the user has no orders, the UI shows a clear empty state in English."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/orders/useMyOrdersQuery.ts",
+          "operation": "create",
+          "description": "Implement a React Query hook that fetches the signed-in user's order list from the backend actor and exposes loading/error/empty states for the My Orders UI."
+        },
+        {
+          "path": "frontend/src/features/orders/MyOrdersPage.tsx",
+          "operation": "create",
+          "description": "Create a mobile-first My Orders screen listing orders (most recent first from backend), with a clear English empty state when none exist; protect this screen with RequireAuthGate; use shadcn-ui components (Card, Button, Skeleton, Alert). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/features/orders/OrderDetailsPage.tsx",
+          "operation": "create",
+          "description": "Add an order detail screen showing order ID, status, date, items (with quantities and unit prices), totals (AED formatting), addresses, pickup schedule, and notes; include navigation back to the list."
+        },
+        {
+          "path": "frontend/src/backend.d.ts",
+          "operation": "modify",
+          "description": "Update frontend Order type definitions to include fields required by the My Orders list and detail views (orderId, status, timestamps, contact fields, pickup schedule, notes) to align the UI with the intended backend capabilities."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire navigation to My Orders from the header and allow selecting an order to open the OrderDetailsPage; ensure unauthenticated users are prompted to sign in."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Apply a coherent mobile-app-style “fresh laundry” theme across the new ordering screens with warm neutrals, teal accents, consistent spacing, and prominent primary actions.",
+      "acceptanceCriteria": [
+        "Mobile layouts prioritize one-column flow, sticky/obvious primary actions (e.g., View Cart / Checkout), and touch-friendly controls.",
+        "Typography, surfaces, and buttons look consistent across all new screens.",
+        "No blue/purple-dominant palette is introduced (keep warm neutrals + teal)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Add/adjust reusable utility classes in Tailwind layers for consistent mobile-app spacing, touch targets, and sticky primary action bars while preserving the existing warm neutral + teal OKLCH theme variables (avoid blue/purple-dominant palette)."
+        },
+        {
+          "path": "frontend/src/features/cart/CartPage.tsx",
+          "operation": "modify",
+          "description": "Ensure the cart screen uses a one-column mobile layout, touch-friendly quantity controls, and a sticky primary action area for Checkout using shadcn-ui components. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/features/checkout/CheckoutPage.tsx",
+          "operation": "modify",
+          "description": "Ensure the checkout screen uses consistent typography, surfaces, spacing, and prominent primary actions, optimized for mobile one-column flow; keep all user-facing text in English; use shadcn-ui components consistently. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/features/orders/MyOrdersPage.tsx",
+          "operation": "modify",
+          "description": "Apply consistent card/list styling, spacing, and primary action patterns to match the catalog/cart/checkout theme using shadcn-ui components. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/features/orders/OrderConfirmationPage.tsx",
+          "operation": "modify",
+          "description": "Apply the same fresh-laundry visual styling and prominent primary actions so confirmation feels cohesive with the rest of the ordering flow."
         }
       ]
     }

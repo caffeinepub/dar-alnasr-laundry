@@ -2,21 +2,118 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-only-the-catalog-item-price-that-renders-in-the-selected-element-at-xpath-html-1-body-1-div-1-div-1-div-1-main-1-div-1-div-4-div-1-div-1-span-1-so-that-it-displays-as-aed-4-i-e-the-backend-price-value-for-that-specific-item-must-be-4",
-      "featureTitle": "Update only the catalog item price that renders in the selected element at XPath `/html[1]/body[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[4]/div[1]/div[1]/span[1]` so that it displays as AED 4 (i.e., the backend `price` value for that specific item must be `4`).",
+      "featureId": "feature-add-a-mobile-first-ordering-flow-that-lets-customers-select-laundry-services-from-the-existing-catalog-set-quantities-per-item-and-review-a-cart-with-line-totals-and-an-order-total-before-checkout",
+      "featureTitle": "Add a mobile-first ordering flow that lets customers select laundry services from the existing catalog, set quantities per item, and review a cart with line totals and an order total before checkout.",
       "files": [
-        "frontend/src/features/catalog/CatalogPage.tsx",
-        "frontend/src/features/catalog/catalog-price-xpath.regression.test.ts"
+        "frontend/src/App.tsx",
+        "frontend/src/features/cart/CartContext.tsx",
+        "frontend/src/features/cart/CartPage.tsx",
+        "frontend/src/features/cart/cartMath.ts",
+        "frontend/src/features/cart/storage.ts",
+        "frontend/src/features/cart/types.ts",
+        "frontend/src/features/cart/useCart.ts",
+        "frontend/src/features/catalog/CatalogPage.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
       ],
       "testIds": [
         "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-a-checkout-screen-that-collects-the-minimum-information-needed-to-place-a-laundry-order-online-customer-name-phone-number-pickup-address-optional-delivery-address-or-a-toggle-for-same-as-pickup-pickup-date-time-window-and-order-notes",
+      "featureTitle": "Implement a checkout screen that collects the minimum information needed to place a laundry order online: customer name, phone number, pickup address, optional delivery address (or a toggle for same-as-pickup), pickup date/time window, and order notes.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/features/checkout/CheckoutPage.tsx",
+        "frontend/src/features/checkout/checkoutTypes.ts",
+        "frontend/src/features/orders/OrderConfirmationPage.tsx",
+        "frontend/src/features/orders/usePlaceOrderMutation.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-require-customers-to-authenticate-with-internet-identity-before-placing-an-order-while-still-allowing-unauthenticated-users-to-browse-the-service-catalog",
+      "featureTitle": "Require customers to authenticate with Internet Identity before placing an order, while still allowing unauthenticated users to browse the service catalog.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/BrandedHeader.tsx",
+        "frontend/src/components/LoginButton.tsx",
+        "frontend/src/components/RequireAuthGate.tsx",
+        "frontend/src/features/cart/storage.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-an-my-orders-area-in-the-ui-that-shows-the-signed-in-customer-their-order-history-and-details-order-id-status-date-items-totals-pickup-info",
+      "featureTitle": "Add an “My Orders” area in the UI that shows the signed-in customer their order history and details (order ID, status, date, items, totals, pickup info).",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/features/orders/MyOrdersPage.tsx",
+        "frontend/src/features/orders/OrderDetailsPage.tsx",
+        "frontend/src/features/orders/useMyOrdersQuery.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-apply-a-coherent-mobile-app-style-visual-theme-across-the-ordering-experience-catalog-cart-checkout-order-confirmation-my-orders-using-a-clean-fresh-laundry-aesthetic-with-warm-neutrals-and-teal-accents-consistent-spacing-and-prominent-primary-actions",
+      "featureTitle": "Apply a coherent mobile-app-style visual theme across the ordering experience (catalog, cart, checkout, order confirmation, my orders) using a clean “fresh laundry” aesthetic with warm neutrals and teal accents, consistent spacing, and prominent primary actions.",
+      "files": [
+        "frontend/src/features/cart/CartPage.tsx",
+        "frontend/src/features/checkout/CheckoutPage.tsx",
+        "frontend/src/features/orders/MyOrdersPage.tsx",
+        "frontend/src/features/orders/OrderConfirmationPage.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
       ],
       "confidence": "high"
     }

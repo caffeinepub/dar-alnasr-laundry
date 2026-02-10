@@ -1,50 +1,115 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T03:10:08.912Z",
-  "summary": "The diff updates catalog data in backend/main.mo and adds a regression test, but it also introduces additional backend migration wiring and frontend behavior changes beyond the requested single-item price update. From the truncated diff, it’s not possible to conclusively verify that only the single catalog item corresponding to the provided XPath was changed (and that no other item prices were modified).",
+  "generatedAt": "2026-02-10T03:28:53.206Z",
+  "summary": "The diff implements a mobile-first catalog-to-cart-to-checkout flow with localStorage-backed cart persistence and Internet Identity gating for checkout/orders. However, the backend order model and APIs shown in the diff do not meet the required data capture (contact fields, pickup schedule, status, timestamps) nor stable unique order IDs, and the frontend order confirmation / order history UI does not display required order ID/status/date/pickup info from backend (it uses an index and a client-generated ID). Several additional changes appear unrelated to the request (URL/session param utilities, admin-token access control initialization, and a catalog price XPath regression test).",
   "missing_requirements": [
     {
-      "id": "REQ-1",
-      "requirement": "Update only the catalog item price that renders at the specified XPath so it displays as AED 4 (backend `price : Nat` for that specific item must be `4`), with no other item prices changing.",
-      "reason": "The diff shows multiple items with `price = 4` in the catalog data, and the provided evidence does not definitively map the XPath-targeted UI element to a single specific backend item entry. Also, because the diff is truncated and no before/after price comparison is shown, it cannot be verified that no other item prices changed.",
+      "id": "REQ-2",
+      "requirement": "After successful submission, show an order confirmation screen with an order ID and a summary of items and totals.",
+      "reason": "Order confirmation uses a client-generated orderId ('ORDER-' + Date.now()) and the confirmation page does not show a summary of items and totals (only the ID and generic text).",
+      "evidence": [
+        "frontend/src/features/checkout/CheckoutPage.tsx",
+        "frontend/src/features/orders/OrderConfirmationPage.tsx"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Backend create order method must record caller Principal, items (category + item name + unit price at time + quantity), totals, customer contact fields, addresses, pickup schedule, notes, status, and timestamps.",
+      "reason": "The backend Order type shown only contains items, totalPrice, and deliveryAddress; it does not include caller principal (as stored data), customer name/phone/pickup address, pickup date/time window, notes, status, or timestamps.",
       "evidence": [
         "backend/main.mo",
-        "frontend/src/features/catalog/catalog-price-xpath.regression.test.ts (implies XPath corresponds to 'Waistcoat')"
+        "backend/migration.mo"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Backend exposes a method to list orders for the calling Principal (most recent first).",
+      "reason": "Frontend calls actor.getMyOrders(), but no getMyOrders method implementation is shown in the backend diff excerpt; only an in-memory 'orders' map and Order types are visible.",
+      "evidence": [
+        "frontend/src/features/orders/useMyOrdersQuery.ts",
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Order IDs are unique and stable across upgrades (monotonic counter in stable state).",
+      "reason": "No orderId field or monotonic counter in stable state is shown; the UI fabricates an ID using Date.now(), which is not stable across upgrades nor authoritative.",
+      "evidence": [
+        "frontend/src/features/checkout/CheckoutPage.tsx",
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "requirement": "My Orders list and details must show order ID, status, date, items, totals, pickup info (addresses, pickup schedule, notes).",
+      "reason": "MyOrdersPage displays 'Order # (index+1)' and total + delivery address only; OrderDetailsPage shows items, delivery address, and total only. No order ID, status, date/timestamps, pickup address/schedule, phone/name, or notes are displayed (and backend Order type lacks them).",
+      "evidence": [
+        "frontend/src/features/orders/MyOrdersPage.tsx",
+        "frontend/src/features/orders/OrderDetailsPage.tsx",
+        "backend/main.mo"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added a backend migration module and wired migration execution into the backend actor.",
-      "reason": "BuildRequest only asked to update one catalog item price in `backend/main.mo` and did not request any migration system changes.",
+      "description": "Admin-token based access-control initialization via a secret URL parameter ('caffeineAdminToken') when creating the backend actor.",
+      "reason": "The BuildRequest specifies no admin functionality/dashboard and no mention of secret admin tokens; this is additional behavior beyond the ordering flow requirements.",
+      "evidence": [
+        "frontend/src/hooks/useActor.ts",
+        "frontend/src/utils/urlParams.ts"
+      ]
+    },
+    {
+      "description": "General-purpose URL/session parameter utilities for persisting parameters in sessionStorage (including logic for hash-based routing).",
+      "reason": "Not requested by any REQ; the ordering flow described uses in-app view state and localStorage cart persistence, not URL param management.",
+      "evidence": [
+        "frontend/src/utils/urlParams.ts"
+      ]
+    },
+    {
+      "description": "Regression test that validates a specific catalog price XPath and references 'updated 2026 prices' behavior.",
+      "reason": "No testing requirements or XPath-based regression criteria were requested; this is extra scope.",
+      "evidence": [
+        "frontend/src/features/catalog/catalog-price-xpath.regression.test.ts",
+        "frontend-file-summaries.txt"
+      ]
+    },
+    {
+      "description": "Backend migration module added as a separate file (migration.mo) defining an 'orders' map migration structure.",
+      "reason": "The BuildRequest constrains backend logic to remain in a single Motoko actor file (backend/main.mo). Adding a separate migration module is additional backend structure not requested.",
       "evidence": [
         "backend/migration.mo",
-        "backend/main.mo (import Migration \"migration\"; and migration run wiring)"
-      ]
-    },
-    {
-      "description": "Added a frontend regression test for XPath price verification.",
-      "reason": "BuildRequest did not request adding tests; it only requested a backend price change for one catalog item.",
-      "evidence": [
-        "frontend/src/features/catalog/catalog-price-xpath.regression.test.ts"
-      ]
-    },
-    {
-      "description": "Introduced/expanded CatalogPage UI behavior (search/filtering, category clamping, loading skeletons, error alert with retry).",
-      "reason": "BuildRequest explicitly focused on updating a single backend catalog item price and did not ask for new catalog page features.",
-      "evidence": [
-        "frontend/src/features/catalog/CatalogPage.tsx"
+        "backend/main.mo"
       ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.72,
   "changed_files": [
     "backend/main.mo",
     "backend/migration.mo",
     "frontend-file-summaries.txt",
+    "frontend/src/App.tsx",
+    "frontend/src/MainApp.tsx",
+    "frontend/src/components/BrandedHeader.tsx",
+    "frontend/src/components/LoginButton.tsx",
+    "frontend/src/components/RequireAuthGate.tsx",
+    "frontend/src/features/cart/CartContext.tsx",
+    "frontend/src/features/cart/CartPage.tsx",
+    "frontend/src/features/cart/cartMath.ts",
+    "frontend/src/features/cart/storage.ts",
+    "frontend/src/features/cart/types.ts",
+    "frontend/src/features/cart/useCart.ts",
     "frontend/src/features/catalog/CatalogPage.tsx",
-    "frontend/src/features/catalog/catalog-price-xpath.regression.test.ts",
+    "frontend/src/features/checkout/CheckoutPage.tsx",
+    "frontend/src/features/checkout/checkoutTypes.ts",
+    "frontend/src/features/orders/MyOrdersPage.tsx",
+    "frontend/src/features/orders/OrderConfirmationPage.tsx",
+    "frontend/src/features/orders/OrderDetailsPage.tsx",
+    "frontend/src/features/orders/useMyOrdersQuery.ts",
+    "frontend/src/features/orders/usePlaceOrderMutation.ts",
+    "frontend/src/hooks/useActor.ts",
+    "frontend/src/utils/urlParams.ts",
     "project_state.json"
   ]
 }

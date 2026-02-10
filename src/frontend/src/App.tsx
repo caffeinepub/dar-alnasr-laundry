@@ -1,10 +1,16 @@
-import { CatalogPage } from './features/catalog/CatalogPage';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { CartProvider } from './features/cart/CartContext';
+import { MainApp } from './MainApp';
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <div className="min-h-screen bg-background">
-      <CatalogPage />
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <CartProvider>
+        <MainApp />
+      </CartProvider>
+    </QueryClientProvider>
   );
 }
 

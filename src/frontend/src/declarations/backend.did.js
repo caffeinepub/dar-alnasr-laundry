@@ -8,28 +8,74 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const UserRole = IDL.Variant({
+  'admin' : IDL.Null,
+  'user' : IDL.Null,
+  'guest' : IDL.Null,
+});
 export const Item = IDL.Record({ 'name' : IDL.Text, 'price' : IDL.Nat });
 export const CatalogCategory = IDL.Record({
   'name' : IDL.Text,
   'items' : IDL.Vec(Item),
 });
 export const Catalog = IDL.Vec(CatalogCategory);
+export const OrderItem = IDL.Record({
+  'categoryName' : IDL.Text,
+  'itemName' : IDL.Text,
+  'quantity' : IDL.Nat,
+  'price' : IDL.Nat,
+});
+export const Order = IDL.Record({
+  'deliveryAddress' : IDL.Text,
+  'items' : IDL.Vec(OrderItem),
+  'totalPrice' : IDL.Nat,
+});
 
 export const idlService = IDL.Service({
+  '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getCatalog' : IDL.Func([], [Catalog], ['query']),
+  'getMyOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
+  'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'placeOrder' : IDL.Func([Order], [], []),
 });
 
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const UserRole = IDL.Variant({
+    'admin' : IDL.Null,
+    'user' : IDL.Null,
+    'guest' : IDL.Null,
+  });
   const Item = IDL.Record({ 'name' : IDL.Text, 'price' : IDL.Nat });
   const CatalogCategory = IDL.Record({
     'name' : IDL.Text,
     'items' : IDL.Vec(Item),
   });
   const Catalog = IDL.Vec(CatalogCategory);
+  const OrderItem = IDL.Record({
+    'categoryName' : IDL.Text,
+    'itemName' : IDL.Text,
+    'quantity' : IDL.Nat,
+    'price' : IDL.Nat,
+  });
+  const Order = IDL.Record({
+    'deliveryAddress' : IDL.Text,
+    'items' : IDL.Vec(OrderItem),
+    'totalPrice' : IDL.Nat,
+  });
   
-  return IDL.Service({ 'getCatalog' : IDL.Func([], [Catalog], ['query']) });
+  return IDL.Service({
+    '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getCatalog' : IDL.Func([], [Catalog], ['query']),
+    'getMyOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
+    'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'placeOrder' : IDL.Func([Order], [], []),
+  });
 };
 
 export const init = ({ IDL }) => { return []; };

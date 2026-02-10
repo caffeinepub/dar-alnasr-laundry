@@ -1,7 +1,17 @@
+import Map "mo:core/Map";
+import Array "mo:core/Array";
+import Nat "mo:core/Nat";
+import Principal "mo:core/Principal";
+import Runtime "mo:core/Runtime";
 import Migration "migration";
+import MixinAuthorization "authorization/MixinAuthorization";
+import AccessControl "authorization/access-control";
 
 (with migration = Migration.run)
 actor {
+  let accessControlState = AccessControl.initState();
+  include MixinAuthorization(accessControlState);
+
   type Item = {
     name : Text;
     price : Nat;
@@ -14,10 +24,24 @@ actor {
 
   type Catalog = [CatalogCategory];
 
+  type OrderItem = {
+    categoryName : Text;
+    itemName : Text;
+    quantity : Nat;
+    price : Nat;
+  };
+
+  type Order = {
+    items : [OrderItem];
+    totalPrice : Nat;
+    deliveryAddress : Text;
+  };
+
+  let orders = Map.empty<Principal, [Order]>();
+
   public query ({ caller }) func getCatalog() : async Catalog {
     [
-      // Wash Dry & Fold (32 items)
-      {
+      { // Wash Dry & Fold
         name = "Wash Dry & Fold";
         items = [
           { name = "Shirt"; price = 6 },
@@ -54,8 +78,7 @@ actor {
           { name = "Curtains (1Sq MTR)"; price = 2 },
         ];
       },
-      // Press & Fold (18 items)
-      {
+      { // Press & Fold
         name = "Press & Fold";
         items = [
           { name = "Shirt"; price = 4 },
@@ -78,8 +101,7 @@ actor {
           { name = "Waist Coats (Ladies)"; price = 2 },
         ];
       },
-      // Wash Dry Press & Fold (17 items)
-      {
+      { // Wash Dry Press & Fold
         name = "Wash Dry Press & Fold";
         items = [
           { name = "Duvet – Kingsize"; price = 120 },
@@ -101,8 +123,7 @@ actor {
           { name = "Underclothes"; price = 5 },
         ];
       },
-      // Dry Cleaning (32 items)
-      {
+      { // Dry Cleaning
         name = "Dry Cleaning";
         items = [
           { name = "Dish Dasha / Kandora"; price = 20 },
@@ -140,5 +161,40 @@ actor {
         ];
       },
     ];
+  };
+
+  public shared ({ caller }) func placeOrder(order : Order) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can place orders");
+    };
+
+    if (order.items.size() == 0) {
+      Runtime.trap("Order must contain at least one item");
+    };
+
+    let totalSum = order.items.foldLeft(
+      0,
+      func(acc, item) { acc + (item.price * item.quantity) },
+    );
+    if (totalSum != order.totalPrice) {
+      Runtime.trap("Total price does not match sum of items");
+    };
+
+    let userOrders = switch (orders.get(caller)) {
+      case (null) { [order] };
+      case (?existingOrders) { existingOrders.concat([order]) };
+    };
+    orders.add(caller, userOrders);
+  };
+
+  public query ({ caller }) func getMyOrders() : async [Order] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view orders");
+    };
+
+    switch (orders.get(caller)) {
+      case (null) { [] };
+      case (?foundOrders) { foundOrders };
+    };
   };
 };

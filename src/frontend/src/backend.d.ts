@@ -7,15 +7,36 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
-export interface CatalogCategory {
-    name: string;
-    items: Array<Item>;
-}
+export type Catalog = Array<CatalogCategory>;
 export interface Item {
     name: string;
     price: bigint;
 }
-export type Catalog = Array<CatalogCategory>;
+export interface CatalogCategory {
+    name: string;
+    items: Array<Item>;
+}
+export interface Order {
+    deliveryAddress: string;
+    items: Array<OrderItem>;
+    totalPrice: bigint;
+}
+export interface OrderItem {
+    categoryName: string;
+    itemName: string;
+    quantity: bigint;
+    price: bigint;
+}
+export enum UserRole {
+    admin = "admin",
+    user = "user",
+    guest = "guest"
+}
 export interface backendInterface {
+    assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    getCallerUserRole(): Promise<UserRole>;
     getCatalog(): Promise<Catalog>;
+    getMyOrders(): Promise<Array<Order>>;
+    isCallerAdmin(): Promise<boolean>;
+    placeOrder(order: Order): Promise<void>;
 }

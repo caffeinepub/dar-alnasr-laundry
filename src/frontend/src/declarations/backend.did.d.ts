@@ -13,7 +13,29 @@ import type { Principal } from '@icp-sdk/core/principal';
 export type Catalog = Array<CatalogCategory>;
 export interface CatalogCategory { 'name' : string, 'items' : Array<Item> }
 export interface Item { 'name' : string, 'price' : bigint }
-export interface _SERVICE { 'getCatalog' : ActorMethod<[], Catalog> }
+export interface Order {
+  'deliveryAddress' : string,
+  'items' : Array<OrderItem>,
+  'totalPrice' : bigint,
+}
+export interface OrderItem {
+  'categoryName' : string,
+  'itemName' : string,
+  'quantity' : bigint,
+  'price' : bigint,
+}
+export type UserRole = { 'admin' : null } |
+  { 'user' : null } |
+  { 'guest' : null };
+export interface _SERVICE {
+  '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getCatalog' : ActorMethod<[], Catalog>,
+  'getMyOrders' : ActorMethod<[], Array<Order>>,
+  'isCallerAdmin' : ActorMethod<[], boolean>,
+  'placeOrder' : ActorMethod<[Order], undefined>,
+}
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];
 export declare const idlFactory: IDL.InterfaceFactory;

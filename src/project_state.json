@@ -1,16 +1,48 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
+  "summary": "Mobile application for a laundry services business enabling customers to choose services and place orders online.",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-only-the-catalog-item-price-that-renders-in-the-selected-element-at-xpath-html-1-body-1-div-1-div-1-div-1-main-1-div-1-div-4-div-1-div-1-span-1-so-that-it-displays-as-aed-4-i-e-the-backend-price-value-for-that-specific-item-must-be-4",
-      "title": "Update only the catalog item price that renders in the selected element at XPath `/html[1]/body[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[4]/div[1]/div[1]/span[1]` so that it displays as AED 4 (i.e., the backend `price` value for that specific item must be `4`).",
+      "id": "feature-add-a-mobile-first-ordering-flow-that-lets-customers-select-laundry-services-from-the-existing-catalog-set-quantities-per-item-and-review-a-cart-with-line-totals-and-an-order-total-before-checkout",
+      "title": "Add a mobile-first ordering flow that lets customers select laundry services from the existing catalog, set quantities per item, and review a cart with line totals and an order total before checkout.",
       "reqIds": [
         "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-checkout-screen-that-collects-the-minimum-information-needed-to-place-a-laundry-order-online-customer-name-phone-number-pickup-address-optional-delivery-address-or-a-toggle-for-same-as-pickup-pickup-date-time-window-and-order-notes",
+      "title": "Implement a checkout screen that collects the minimum information needed to place a laundry order online: customer name, phone number, pickup address, optional delivery address (or a toggle for same-as-pickup), pickup date/time window, and order notes.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-require-customers-to-authenticate-with-internet-identity-before-placing-an-order-while-still-allowing-unauthenticated-users-to-browse-the-service-catalog",
+      "title": "Require customers to authenticate with Internet Identity before placing an order, while still allowing unauthenticated users to browse the service catalog.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-my-orders-area-in-the-ui-that-shows-the-signed-in-customer-their-order-history-and-details-order-id-status-date-items-totals-pickup-info",
+      "title": "Add an “My Orders” area in the UI that shows the signed-in customer their order history and details (order ID, status, date, items, totals, pickup info).",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-coherent-mobile-app-style-visual-theme-across-the-ordering-experience-catalog-cart-checkout-order-confirmation-my-orders-using-a-clean-fresh-laundry-aesthetic-with-warm-neutrals-and-teal-accents-consistent-spacing-and-prominent-primary-actions",
+      "title": "Apply a coherent mobile-app-style visual theme across the ordering experience (catalog, cart, checkout, order confirmation, my orders) using a clean “fresh laundry” aesthetic with warm neutrals and teal accents, consistent spacing, and prominent primary actions.",
+      "reqIds": [
+        "REQ-6"
       ],
       "version": 1
     }
@@ -18,12 +50,21 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Update the relevant price/value to AED 4",
+      "summary": "Build a mobile app for laundry services where customers can select required services and place orders online.",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Add backend support for placing and viewing orders: define order data types, persist orders in canister state, and expose methods to create an order and list the authenticated caller’s orders.",
+      "reqIds": [
+        "REQ-4"
+      ],
       "status": "pending"
     }
   ],
-  "projectName": "Update the selected catalog price to AED 4",
+  "gameProjectType": "none",
+  "projectName": "Add mobile-first online ordering flow for laundry services",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }
